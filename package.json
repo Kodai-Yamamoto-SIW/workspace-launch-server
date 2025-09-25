@@ -12,13 +12,12 @@
         "README.md"
     ],
     "bin": {
-        "workspace-launch-server": "./dist/server.js"
+        "workspace-launch-server": "./dist/workspace-launch-server"
     },
     "scripts": {
-        "build": "tsc -p tsconfig.json",
+        "build": "tsc -p tsconfig.json && node ./scripts/postbuild.cjs",
         "dev": "tsx watch src/server.ts",
-        "start": "node ./dist/server.js",
-        "prepare": "npm run build"
+        "start": "node ./dist/server.js"
     },
     "dependencies": {
         "express": "^4.19.2"
