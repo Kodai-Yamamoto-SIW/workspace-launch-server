@@ -1,0 +1,41 @@
+import fs from 'fs/promises';
+import fsSync from 'fs';
+import path from 'path';
+import { TEMPLATE_ROOT } from '../config';
+import { sanitize } from './storage';
+
+export type ManifestEntry =
+    | { path: string; type: 'directory' }
+    | { path: string; type: 'file'; contentBase64: string };
+
+export async function encodeDirToManifest(dir: string, base = ''): Promise<ManifestEntry[]> {
+    let out: ManifestEntry[] = [];
+    const entries = await fs.readdir(dir, { withFileTypes: true });
+    for (const entry of entries) {
+        const rel = path.posix.join(base, entry.name);
+        const abs = path.join(dir, entry.name);
+        if (entry.isDirectory()) {
+            out.push({ path: `${rel}/`, type: 'directory' });
+            out = out.concat(await encodeDirToManifest(abs, rel));
+        } else if (entry.isFile()) {
+            const buf = await fs.readFile(abs);
+            out.push({ path: rel, type: 'file', contentBase64: buf.toString('base64') });
+        }
+    }
+    return out;
+}
+
+export async function loadManifestForExercise(exercise = 'unknown'): Promise<ManifestEntry[]> {
+    const templateDir = path.join(TEMPLATE_ROOT, sanitize(exercise));
+    if (fsSync.existsSync(templateDir)) {
+        const manifest = await encodeDirToManifest(templateDir);
+        manifest.unshift({ path: '', type: 'directory' });
+        return manifest;
+    }
+    return [
+        { path: '', type: 'directory' },
+        { path: 'index.html', type: 'file', contentBase64: '' },
+        { path: 'index.js', type: 'file', contentBase64: '' },
+        { path: 'index.css', type: 'file', contentBase64: '' },
+    ];
+}
