@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import express from 'express';
 import { PORT, STORAGE_ROOT } from './config';
 import { ensureDir } from './utils/storage';
