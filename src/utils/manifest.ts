@@ -2,7 +2,7 @@ import fs from 'fs/promises';
 import fsSync from 'fs';
 import path from 'path';
 import { TEMPLATE_ROOT } from '../config';
-import { sanitize } from './storage';
+import { sanitize, userRoot, UserMeta } from './storage';
 
 export type ManifestEntry =
     | { path: string; type: 'directory' }
@@ -25,13 +25,34 @@ export async function encodeDirToManifest(dir: string, base = ''): Promise<Manif
     return out;
 }
 
-export async function loadManifestForExercise(exercise = 'unknown'): Promise<ManifestEntry[]> {
+async function directoryHasContents(candidate: string): Promise<boolean> {
+    if (!fsSync.existsSync(candidate)) {
+        return false;
+    }
+    const entries = await fs.readdir(candidate, { withFileTypes: true });
+    return entries.length > 0;
+}
+
+export async function loadManifestForExercise(meta: UserMeta = {}): Promise<ManifestEntry[]> {
+    const exercise = meta.exercise ?? 'unknown';
+    const storageDir = userRoot({
+        student: meta.student ?? 'unknown',
+        exercise,
+    });
+
+    if (await directoryHasContents(storageDir)) {
+        const manifest = await encodeDirToManifest(storageDir);
+        manifest.unshift({ path: '', type: 'directory' });
+        return manifest;
+    }
+
     const templateDir = path.join(TEMPLATE_ROOT, sanitize(exercise));
     if (fsSync.existsSync(templateDir)) {
         const manifest = await encodeDirToManifest(templateDir);
         manifest.unshift({ path: '', type: 'directory' });
         return manifest;
     }
+
     return [
         { path: '', type: 'directory' },
         { path: 'index.html', type: 'file', contentBase64: '' },

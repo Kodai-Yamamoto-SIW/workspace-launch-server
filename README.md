@@ -29,7 +29,7 @@ npm パッケージとして利用する場合は、依存関係に追加しま�
 npm install @kodai-yamamoto-siw/workspace-launch-server
 ```
 
-- テンプレートはプロジェクト直下ではなく、`.workspace-launch/templates/` に配置してください。
+- テンプレートはプロジェクト直下ではなく、`.workspace-launch/templates/` に配置してください (学生が作業を開始すると `.workspace-launch/storage/` に保存され、次回以降はこちらが配布されます)。
 - 上記が存在しない場合は、パッケージ同梱の `templates/` ディレクトリにフォールバックします。
 - 任意のテンプレートを利用したい場合は `TEMPLATE_ROOT` 環境変数でパスを上書きしてください。
 - 例: `.workspace-launch/templates/week1/README.md`, `.workspace-launch/templates/week1/src/main.py` など。
