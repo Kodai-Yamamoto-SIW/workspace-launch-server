@@ -30,8 +30,9 @@ npm install @kodai-yamamoto-siw/workspace-launch-server
 ```
 
 テンプレートの置き場所:
-- 既定では、パッケージ同梱の `templates/` ディレクトリが使用されます。
-- 別のテンプレートを利用したい場合は `TEMPLATE_ROOT` 環境変数でパスを上書きしてください。
+- 既定では、コマンドを実行したプロジェクト（npm でインストールした側）の `templates/` ディレクトリを優先的に使用します。
+- 上記が存在しない場合は、パッケージ同梱の `templates/` ディレクトリにフォールバックします。
+- 任意のテンプレートを利用したい場合は `TEMPLATE_ROOT` 環境変数でパスを上書きしてください。
 - 例: `server/templates/week1/README.md`, `server/templates/week1/src/main.py` など。
 
 ## ローカル開発 (パッケージ側)
