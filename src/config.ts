@@ -5,61 +5,73 @@ const DEFAULT_PORT = 8787;
 const rawPort = process.env.PORT;
 const parsedPort = rawPort ? Number.parseInt(rawPort, 10) : DEFAULT_PORT;
 
-function resolveTemplateRoot(): string {
-    const packageTemplateRoot = path.resolve(__dirname, '../templates');
-    const searchRoots = new Set<string>();
-    
-    // Add current working directory
-    const cwd = process.cwd();
-    if (cwd) {
-        searchRoots.add(cwd);
+function unique<T>(values: (T | undefined | null)[]): T[] {
+    const out: T[] = [];
+    for (const value of values) {
+        if (value == null) continue;
+        if (!out.includes(value)) {
+            out.push(value);
+        }
     }
-    
-    // Add npm project root (where package.json is located)
-    const npmProjectRoot = process.env.npm_config_local_prefix || process.env.PWD || process.env.INIT_CWD;
-    if (npmProjectRoot) {
-        searchRoots.add(path.resolve(npmProjectRoot));
-    }
-    
-    // Add parent directories of the current working directory
-    let current = cwd;
-    while (current && path.dirname(current) !== current) {
-        searchRoots.add(current);
-        current = path.dirname(current);
-    }
+    return out;
+}
 
-    const visited = new Set<string>();
+function resolveCandidateRoots(): string[] {
+    const rawCandidates = unique([
+        process.env.WORKSPACE_LAUNCH_PROJECT_ROOT,
+        process.env.INIT_CWD,
+        process.env.PWD,
+        process.env.npm_config_local_prefix,
+        process.cwd(),
+    ]);
 
-    for (const root of searchRoots) {
-        let searchPath = path.resolve(root);
-        for (;;) {
-            if (visited.has(searchPath)) {
-                break;
-            }
-            visited.add(searchPath);
+    return rawCandidates.map((candidate) => path.resolve(candidate));
+}
 
-            const candidate = path.join(searchPath, 'templates');
-            if (existsSync(candidate)) {
-                console.log(`Using templates from: ${candidate}`);
-                return candidate;
-            }
+function resolveProjectRoot(): string {
+    const candidates = resolveCandidateRoots();
 
-            const parent = path.dirname(searchPath);
-            if (parent === searchPath) {
-                break;
-            }
-            searchPath = parent;
+    for (const candidate of candidates) {
+        if (candidate.includes('node_modules')) {
+            continue;
+        }
+        const pkg = path.join(candidate, 'package.json');
+        if (existsSync(pkg)) {
+            return candidate;
         }
     }
 
-    console.log(`Using default templates from: ${packageTemplateRoot}`);
-    return packageTemplateRoot;
+    for (const candidate of candidates) {
+        if (!candidate.includes('node_modules')) {
+            return candidate;
+        }
+    }
+
+    return candidates[0] ?? path.resolve('.');
 }
 
-const defaultTemplateRoot = resolveTemplateRoot();
+const PROJECT_ROOT = resolveProjectRoot();
+const DATA_ROOT = path.join(PROJECT_ROOT, '.workspace-launch');
+
+function resolveDefaultTemplateRoot(): string {
+    const candidate = path.join(DATA_ROOT, 'templates');
+    if (existsSync(candidate)) {
+        console.log(`Using templates from: ${candidate}`);
+        return candidate;
+    }
+
+    const fallback = path.resolve(__dirname, '../templates');
+    console.log(`Using default templates from: ${fallback}`);
+    return fallback;
+}
+
+const defaultTemplateRoot = resolveDefaultTemplateRoot();
+const defaultStorageRoot = path.join(DATA_ROOT, 'storage');
 
 export const PORT = Number.isNaN(parsedPort) ? DEFAULT_PORT : parsedPort;
-export const STORAGE_ROOT = path.resolve(process.env.STORAGE_ROOT ?? './storage');
+export const STORAGE_ROOT = path.resolve(process.env.STORAGE_ROOT ?? defaultStorageRoot);
 export const TEMPLATE_ROOT = process.env.TEMPLATE_ROOT
     ? path.resolve(process.env.TEMPLATE_ROOT)
     : defaultTemplateRoot;
+
+export const PROJECT_DATA_ROOT = DATA_ROOT;

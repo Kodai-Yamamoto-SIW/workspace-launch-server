@@ -29,11 +29,10 @@ npm パッケージとして利用する場合は、依存関係に追加しま�
 npm install @kodai-yamamoto-siw/workspace-launch-server
 ```
 
-テンプレートの置き場所:
-- 既定では、コマンドを実行したプロジェクト（npm でインストールした側）の `templates/` ディレクトリを優先的に使用します。
+- テンプレートはプロジェクト直下ではなく、`.workspace-launch/templates/` に配置してください。
 - 上記が存在しない場合は、パッケージ同梱の `templates/` ディレクトリにフォールバックします。
 - 任意のテンプレートを利用したい場合は `TEMPLATE_ROOT` 環境変数でパスを上書きしてください。
-- 例: `server/templates/week1/README.md`, `server/templates/week1/src/main.py` など。
+- 例: `.workspace-launch/templates/week1/README.md`, `.workspace-launch/templates/week1/src/main.py` など。
 
 ## ローカル開発 (パッケージ側)
 
@@ -57,8 +56,8 @@ npm run build
 
 環境変数:
 - `PORT` (既定: 8787)
-- `STORAGE_ROOT` 受信した学生ごとの作業内容を保存するルート (既定: `./storage`)
-- `TEMPLATE_ROOT` 配布テンプレートのルート (既定: `./server/templates`)
+- `STORAGE_ROOT` 受信した学生ごとの作業内容を保存するルート (既定: `./.workspace-launch/storage`)
+- `TEMPLATE_ROOT` 配布テンプレートのルート (既定: `.workspace-launch/templates` が存在しない場合はパッケージ同梱テンプレート)
 
 動作確認:
 - http://localhost:8787/manifest?student=alice&exercise=demo
