@@ -1,17 +1,17 @@
 import express from 'express';
-import { loadManifestForExercise } from '../utils/manifest';
+import { loadManifestForWorkspaceId } from '../utils/manifest';
 
-function resolveStudent(raw: unknown): string {
+function resolveOwnerId(raw: unknown): string {
     if (Array.isArray(raw)) {
-        return resolveStudent(raw[0]);
+        return resolveOwnerId(raw[0]);
     }
     const value = typeof raw === 'string' ? raw : undefined;
     return value && value.length > 0 ? value : 'unknown';
 }
 
-function resolveExercise(raw: unknown): string {
+function resolveWorkspaceId(raw: unknown): string {
     if (Array.isArray(raw)) {
-        return resolveExercise(raw[0]);
+        return resolveWorkspaceId(raw[0]);
     }
     const value = typeof raw === 'string' ? raw : undefined;
     return value && value.length > 0 ? value : 'unknown';
@@ -21,10 +21,10 @@ export function createManifestRouter(): express.Router {
     const router = express.Router();
 
     router.get('/', async (req, res) => {
-        const student = resolveStudent(req.query.student);
-        const exercise = resolveExercise(req.query.exercise);
+        const ownerId = resolveOwnerId(req.query.ownerId);
+        const workspaceId = resolveWorkspaceId(req.query.workspaceId);
         try {
-            const manifest = await loadManifestForExercise({ student, exercise });
+            const manifest = await loadManifestForWorkspaceId({ ownerId, workspaceId });
             res.json(manifest);
         } catch (error) {
             console.error('manifest error', error);

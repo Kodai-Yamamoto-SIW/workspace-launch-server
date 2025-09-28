@@ -37,8 +37,8 @@ const isString = (value: unknown): value is string => typeof value === 'string';
 
 function toMeta(body: UserMeta | undefined): Required<UserMeta> {
     return {
-        student: isString(body?.student) && body.student.length > 0 ? body.student : 'unknown',
-        exercise: isString(body?.exercise) && body.exercise.length > 0 ? body.exercise : 'default',
+        ownerId: isString(body?.ownerId) && body.ownerId.length > 0 ? body.ownerId : 'unknown',
+        workspaceId: isString(body?.workspaceId) && body.workspaceId.length > 0 ? body.workspaceId : 'default',
     };
 }
 

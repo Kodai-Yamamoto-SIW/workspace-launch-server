@@ -33,11 +33,11 @@ async function directoryHasContents(candidate: string): Promise<boolean> {
     return entries.length > 0;
 }
 
-export async function loadManifestForExercise(meta: UserMeta = {}): Promise<ManifestEntry[]> {
-    const exercise = meta.exercise ?? 'unknown';
+export async function loadManifestForWorkspaceId(meta: UserMeta = {}): Promise<ManifestEntry[]> {
+    const workspaceId = meta.workspaceId ?? 'unknown';
     const storageDir = userRoot({
-        student: meta.student ?? 'unknown',
-        exercise,
+        ownerId: meta.ownerId ?? 'unknown',
+        workspaceId,
     });
 
     if (await directoryHasContents(storageDir)) {
@@ -46,7 +46,7 @@ export async function loadManifestForExercise(meta: UserMeta = {}): Promise<Mani
         return manifest;
     }
 
-    const templateDir = path.join(TEMPLATE_ROOT, sanitize(exercise));
+    const templateDir = path.join(TEMPLATE_ROOT, sanitize(workspaceId));
     if (fsSync.existsSync(templateDir)) {
         const manifest = await encodeDirToManifest(templateDir);
         manifest.unshift({ path: '', type: 'directory' });

@@ -33,6 +33,6 @@ app.get('/_events', (_req, res) => {
 app.listen(PORT, async () => {
     await ensureDir(STORAGE_ROOT);
     console.log(`Server listening on http://localhost:${PORT}`);
-    console.log('Manifest: GET /manifest?student=alice&exercise=demo');
+    console.log('Manifest: GET /manifest?ownerId=alice&workspaceId=demo');
     console.log('Events:   GET /_events');
 });

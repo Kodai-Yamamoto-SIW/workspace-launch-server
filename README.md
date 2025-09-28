@@ -3,7 +3,7 @@
 このフォルダには、VS Code 拡張機能「Workspace Launch by Link」用のサーバー実装が入っています。このコードは npm パッケージ `@kodai-yamamoto-siw/workspace-launch-server` として配布することを想定しています。
 
 提供するエンドポイント:
-- GET /manifest?student&exercise&token
+- GET /manifest?ownerId&workspaceId&token
 - POST /event/fileSnapshot
 - POST /event/create
 - POST /event/delete
@@ -60,5 +60,5 @@ npm run build
 - `TEMPLATE_ROOT` 配布テンプレートのルート (既定: `.workspace-launch/templates` が存在しない場合はパッケージ同梱テンプレート)
 
 動作確認:
-- http://localhost:8787/manifest?student=alice&exercise=demo
+- http://localhost:8787/manifest?ownerId=alice&workspaceId=demo
 - http://localhost:8787/_events

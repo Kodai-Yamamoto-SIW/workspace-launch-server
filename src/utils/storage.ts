@@ -3,16 +3,16 @@ import path from 'path';
 import { STORAGE_ROOT } from '../config';
 
 export interface UserMeta {
-    student?: string;
-    exercise?: string;
+    ownerId?: string;
+    workspaceId?: string;
 }
 
 export function sanitize(value: unknown): string {
     return String(value ?? '').replace(/[^a-zA-Z0-9._-]/g, '_');
 }
 
-export function userRoot({ student = 'unknown', exercise = 'default' }: UserMeta = {}): string {
-    return path.join(STORAGE_ROOT, sanitize(student), sanitize(exercise));
+export function userRoot({ ownerId = 'unknown', workspaceId = 'default' }: UserMeta = {}): string {
+    return path.join(STORAGE_ROOT, sanitize(ownerId), sanitize(workspaceId));
 }
 
 export async function ensureDir(targetPath: string): Promise<void> {
